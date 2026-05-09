@@ -6,7 +6,7 @@ Django의 Custom QuerySet과 Custom Manager를 직접 실행하며 학습하는 
 
 - Python 3.11 이상
 - pip
-- `.env` 파일 (강사에게 별도 수령)
+- `.env` 파일
 
 ---
 
