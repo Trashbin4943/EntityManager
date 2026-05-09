@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>{{ config.label }}</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Courier New', monospace; background: #f5f5f5; margin: 0; padding: 32px; }
+  a.back { color: #555; text-decoration: none; font-size: 0.88em; }
+  a.back:hover { text-decoration: underline; }
+
+  .card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 20px 24px; margin: 16px 0; }
+  .qs-code { font-size: 1.05em; color: #0a5275; font-weight: bold; margin-bottom: 6px; }
+  .qs-desc { color: #666; font-size: 0.88em; margin-bottom: 14px; }
+  .sql-label { font-size: 0.78em; color: #999; margin-bottom: 4px; }
+  .sql-box { background: #1e1e1e; color: #ce9178; padding: 10px 14px; border-radius: 4px; font-size: 0.8em; word-break: break-all; }
+
+  .result-title { font-size: 0.95em; font-weight: bold; margin: 24px 0 10px; color: #333; }
+  table { width: 100%; border-collapse: collapse; background: #fff; font-size: 0.88em; }
+  th { background: #222; color: #fff; padding: 8px 12px; text-align: left; }
+  td { border-bottom: 1px solid #eee; padding: 8px 12px; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 0.8em; }
+  .badge-pub   { background: #d4edda; color: #155724; }
+  .badge-draft { background: #f8d7da; color: #721c24; }
+  .empty-msg { color: #999; font-size: 0.9em; padding: 12px 0; }
+  .count-badge { font-weight: normal; color: #888; font-size: 0.9em; }
+
+  /* 사이드 nav */
+  .layout { display: flex; gap: 24px; align-items: flex-start; }
+  .main-col { flex: 1; min-width: 0; }
+  .nav-col { width: 260px; flex-shrink: 0; }
+  .nav-col .nav-title { font-size: 0.82em; color: #999; margin-bottom: 8px; }
+  .nav-link {
+    display: block; padding: 7px 12px; font-size: 0.82em;
+    color: #0a5275; text-decoration: none;
+    border-left: 3px solid transparent;
+    border-radius: 0 3px 3px 0;
+    margin-bottom: 2px;
+  }
+  .nav-link:hover { background: #eef4f7; border-left-color: #0a5275; }
+  .nav-link.active { background: #e8f2f7; border-left-color: #0a5275; font-weight: bold; color: #074260; }
+</style>
+</head>
+<body>
+
+<a href="{% url 'main' %}" class="back">← 메인으로</a>
+
+<div class="layout">
+  <div class="main-col">
+    <!-- QuerySet 정보 카드 -->
+    <div class="card">
+      <div class="qs-code">{{ config.label }}</div>
+      <div class="qs-desc">{{ config.desc }}</div>
+      <div class="sql-label">실행된 SQL</div>
+      <div class="sql-box">{{ sql }}</div>
+    </div>
+
+    <!-- 결과 테이블 -->
+    <div class="result-title">
+      결과 <span class="count-badge">({{ posts|length }}건)</span>
+    </div>
+    {% if posts %}
+    <table>
+      <thead>
+        <tr><th>id</th><th>title</th><th>user</th><th>is_published</th><th>view_count</th></tr>
+      </thead>
+      <tbody>
+        {% for post in posts %}
+        <tr>
+          <td>{{ post.pk }}</td>
+          <td>{{ post.title }}</td>
+          <td>{{ post.user }}</td>
+          <td>
+            {% if post.is_published %}
+              <span class="badge badge-pub">공개</span>
+            {% else %}
+              <span class="badge badge-draft">초안</span>
+            {% endif %}
+          </td>
+          <td>{{ post.view_count }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty-msg">이 QuerySet 조건에 해당하는 게시글이 없습니다.</p>
+    {% endif %}
+  </div>
+
+  <!-- 사이드 네비게이션 -->
+  <div class="nav-col">
+    <div class="nav-title">다른 QuerySet 실행</div>
+    {% for qs in querysets %}
+    <a href="{% url 'qs_result' qs.key %}"
+       class="nav-link {% if qs.key == config.key %}active{% endif %}">
+      {{ qs.label }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+</body>
+</html>
